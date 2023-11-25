@@ -1,0 +1,157 @@
+<!doctype html>
+<html lang="en">
+{% load static %}
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+    <title>Login</title>
+    <link rel="shortcut icon" href="{% static 'assets/images/fav.png' %}" type="image/x-icon">
+    <link href="https://fonts.googleapis.com/css?family=Josefin+Sans:300,400,600,700" rel="stylesheet">
+    <link rel="shortcut icon" href="{% static 'assets/images/fav.jpg' %}">
+    <link rel="stylesheet" href="{% static 'assets/css/bootstrap.min.css' %}">
+    <link rel="stylesheet" href="{% static 'assets/css/fontawsom-all.min.css' %}">
+    <link rel="stylesheet" type="text/css" href="{% static 'assets/css/style.css' %}" />
+</head>
+
+<body>
+    <div class="container-fluid">
+        <div class="container">
+            <div class="col-xl-10 col-lg-11 login-container">
+                <div class="row">
+                    <div class="col-lg-7 img-box">
+                        <img src="{% static 'assets/images/login-banner.png' %}" alt="">
+                    </div>
+                    <div class="col-lg-5 no-padding">
+                        <form method="POST" name="loginform" action="" class="signup-form" id="register_form">
+                        {% csrf_token %}
+                            <div class="login-box">
+                                <h5>Welcome!</h5>
+
+                                <div class="login-row row no-margin">
+                                    <div class="form-check form-check-inline">
+                                        <input class="form-check-input" type="radio" name="login_type" id="loginType1" value="student" checked>
+                                        <label class="form-check-label" for="loginType1">Student</label>
+                                    </div>
+                                    <div class="form-check form-check-inline">
+                                        <input class="form-check-input" type="radio" name="login_type" id="loginType2" value="instructor">
+                                        <label class="form-check-label" for="loginType2">Instructor</label>
+                                    </div>
+                                </div>
+
+                                <div class="login-row row no-margin">
+                                    <label for=""><i class="fas fa-envelope"></i> Email Address</label>
+                                    <input type="text" id="email" class="form-control form-control-sm" name="email">
+                                </div>
+
+                                 <div class="login-row row no-margin">
+                                    <label for=""><i class="fas fa-unlock-alt"></i> Password</label>
+                                    <input type="text" id="password" class="form-control form-control-sm" name="password">
+                                </div>
+
+                                 <div class="login-row row forrr no-margin">
+    <!--                               <p> <input type="checkbox"> Remember Me</p>-->
+    <!--                               <p><a href="">Forget Password?</a></p>-->
+                                </div>
+
+                                 <div class="login-row btnroo row no-margin">
+                                   <button class="btn btn-primary btn-sm" onclick="login_submit()"> Sign In</button>
+                                </div>
+                                <div class="login-row donroo row no-margin">
+                                   <p>Dont have an Account ? <a href="register">Sign Up</a></p>
+                                </div>
+                            </div>
+                        </form>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</body>
+
+    <script src="{% static 'assets/js/jquery-3.2.1.min.js' %}"></script>
+    <script src="{% static 'assets/js/popper.min.js' %}"></script>
+    <script src="{% static 'assets/js/bootstrap.min.js' %}"></script>
+    <script src="{% static 'assets/plugins/scroll-fixed/jquery-scrolltofixed-min.js' %}"></script>
+    <script src="{% static 'assets/js/script.js' %}"></script>
+
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+    {% if messages %}
+    <script>
+        {% for message in messages %}
+
+
+        var toastMixin = Swal.mixin({
+        toast: true,
+        icon: '{{message.tags}}',
+        title: 'General Title',
+        animation: false,
+        position: 'top-right',
+        showConfirmButton: false,
+        timer: 5000,
+        timerProgressBar: true,
+        didOpen: (toast) => {
+        toast.addEventListener('mouseenter', Swal.stopTimer)
+        toast.addEventListener('mouseleave', Swal.resumeTimer)
+        }
+        });
+        toastMixin.fire({
+        animation: true,
+        title: "{{message}}"
+        });
+        {% endfor %}
+
+    </script>
+    {% endif %}
+
+    <script>
+        function login_submit(){
+            event.preventDefault()
+
+            var radioButtons = document.getElementsByName('login_type');
+
+            for (var i = 0; i < radioButtons.length; i++) {
+                if (radioButtons[i].checked) {
+                    var inputValue = radioButtons[i].value;
+                    break;
+                }
+            }
+
+			$.ajax({
+				url: "login-check",
+				data: {
+				    login_type : inputValue,
+					email : $("#email").val(),
+					password : $("#password").val(),
+				},
+				success: function (data) {
+					status = data['status']
+					message = data['message']
+					if(status == "error"){
+						var toastMixin = Swal.mixin({
+							toast: true,
+							icon: 'error',
+							title: 'General Title',
+							animation: false,
+							position: 'top-right',
+							showConfirmButton: false,
+							timer: 1000,
+							timerProgressBar: true,
+							didOpen: (toast) => {
+								toast.addEventListener('mouseenter', Swal.stopTimer)
+								toast.addEventListener('mouseleave', Swal.resumeTimer)
+							}
+						});
+						toastMixin.fire({
+						animation: true,
+						title: message
+						});
+					}
+					else{
+						document.forms["loginform"].submit();
+					}
+				}
+			});
+        }
+    </script>
+
+</html>

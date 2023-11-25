@@ -1,0 +1,119 @@
+<!DOCTYPE html>
+<html lang="en">
+{% load static %}
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta http-equiv="X-UA-Compatible" content="ie=edge">
+    <title>Sign Up</title>
+
+    <!-- Font Icon -->
+    <link rel="stylesheet" href="{% static 'index/fonts/material-icon/css/material-design-iconic-font.min.css' %}">
+
+    <!-- Main css -->
+    <link rel="stylesheet" href="{% static 'index/css/style.css' %}">
+</head>
+<body>
+
+    <div class="main">
+
+        <h1>Sign up</h1>
+        <div class="container">
+            <div class="sign-up-content">
+                <form method="POST" action="" class="signup-form" id="register_form">
+                    {% csrf_token %}
+                    <h2 class="form-title">What type of user are you ?</h2>
+                    <div class="form-radio" style="margin-left: 50px;">
+                        <input type="radio" name="user_type" value="student" id="student" checked="checked" />
+                        <label for="student">Student</label>
+
+                        <input type="radio" name="user_type" value="instructor" id="instructor" />
+                        <label for="instructor">Instructor</label>
+
+                    </div>
+
+                    <div class="form-textbox">
+                        <label for="name">Full name</label>
+                        <input type="text" name="name" id="name" />
+                    </div>
+
+                    <div class="form-textbox">
+                        <label for="email">Email</label>
+                        <input type="email" name="email" id="email" />
+                    </div>
+
+                    <div class="form-textbox">
+                        <label for="pass">Password</label>
+                        <input type="password" name="password" id="pass" />
+                    </div>
+
+<!--                    <div class="form-group">-->
+<!--                        <input type="checkbox" name="agree-term" id="agree-term" class="agree-term" />-->
+<!--                        <label for="agree-term" class="label-agree-term"><span><span></span></span>I agree all statements in  <a href="#" class="term-service">Terms of service</a></label>-->
+<!--                    </div>-->
+
+                    <div class="form-textbox" style="margin-top:40px;">
+                        <input type="button" name="submit_button" id="submit_button" class="submit" onclick="register_submit()" value="Create account" />
+                    </div>
+                </form>
+
+                <p class="loginhere">
+                    Already have an account ?<a href="/" class="loginhere-link"> Log in</a>
+                </p>
+            </div>
+        </div>
+
+    </div>
+
+    <!-- JS -->
+    <script src="{% static 'index/vendor/jquery/jquery.min.js' %}"></script>
+    <script src="{% static 'index/js/main.js' %}"></script>
+
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+
+    <script>
+        function register_submit(){
+            event.preventDefault()
+            var form_data = new FormData($('#register_form')[0]);
+            $.ajax({
+                type: 'POST',
+                url: "register-data",
+                data: form_data,
+                processData: false,
+                contentType: false,
+                success: function(data)
+                {
+                    status = data['status']
+                    message = data['message']
+
+                    if (status == "success"){
+                        document.getElementById('register_form').submit();
+                    }
+
+                    var toastMixin = Swal.mixin({
+                    toast: true,
+                    icon: status,
+                    title: 'General Title',
+                    animation: false,
+                    position: 'top-right',
+                    showConfirmButton: false,
+                    timer: 3000,
+                    timerProgressBar: true,
+                    didOpen: (toast) => {
+                        toast.addEventListener('mouseenter', Swal.stopTimer)
+                        toast.addEventListener('mouseleave', Swal.resumeTimer)
+                    }
+                    });
+                    toastMixin.fire({
+                    animation: true,
+                    title: message
+                    });
+
+                }
+            })
+
+        }
+    </script>
+
+</body>
+</html>

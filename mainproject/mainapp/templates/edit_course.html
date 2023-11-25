@@ -1,0 +1,149 @@
+<div id="edit_course_modal" class="modal fade" role="dialog">
+    <div class="modal-dialog modal-lg">
+        <form class="form-horizontal auth-form" id="course_edit_form" action="instructor-dashboard" method="POST" enctype="multipart/form-data">
+            {% csrf_token %}
+            <input type="hidden" value="{{data.id}}" name="course_id">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <button type="button" class="close" data-dismiss="modal">&times;</button>
+                    <h4 class="modal-title">Edit Course</h4>
+                </div>
+                <div class="modal-body">
+                    <div class="row mb-2">
+                        <div class="col-md-6">
+                            <div class="form-group mb-2">
+                                <label class="form-label" for="firstname">Course Name</label>
+                                <div class="input-group">
+                                    <input type="text" class="form-control" name="course_name" value="{{data.course_name}}" required>
+                                </div>
+                            </div><!--end form-group-->
+                        </div>
+                        <div class="col-md-6">
+                            <div class="form-group mb-2">
+                                <label class="form-label" for="firstname">Contact Us</label>
+                                <div class="input-group">
+                                    <input type="text" value="{{data.contact_number}}" class="form-control number_input" name="contact" required>
+                                </div>
+                            </div><!--end form-group-->
+                        </div>
+                        <div class="col-md-6">
+                            <div class="form-group mb-2">
+                                <label class="form-label" for="firstname">Amount</label>
+                                <div class="input-group">
+                                    <input type="text" value="{{data.amount}}" class="form-control number_input" name="amount" required>
+                                </div>
+                            </div><!--end form-group-->
+                        </div>
+                        <div class="col-md-6">
+                            <h6 class="selct-box-head">Course Type</h6>
+                            <div class="d-flex">
+                                <div class="form-check">
+                                    <input class="form-check-input" type="radio" onclick="course_type_new1('file')" name="course_type" id="file" value="file" {% if data.course_type == "file" %} checked {% endif %}>
+                                    <label class="form-check-label" for="file">
+                                        File
+                                    </label>
+                                </div>
+
+                                <div class="form-check ms-3">
+                                    <input class="form-check-input" type="radio" onclick="course_type_new1('link')" name="course_type" id="link" value="link" {% if data.course_type == "link" %} checked {% endif %}>
+                                    <label class="form-check-label" for="link">
+                                        Link
+                                    </label>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="col-md-6" id="link_div1" {% if data.course_type == "file" %} style="display:none;" {% endif %}>
+                            <div class="form-group mb-2">
+                                <label class="form-label" for="firstname">Course Link</label>
+                                <div class="input-group">
+                                    <input type="text" class="form-control" name="course_link" {% if data.course_link != None %} value="{{data.course_link}}" {% endif %} required>
+                                </div>
+                            </div><!--end form-group-->
+                        </div>
+                        <div class="col-md-6" id="file_div1" {% if data.course_type == "link" %} style="display:none;" {% endif %}>
+                            <div class="form-group mb-2">
+                                <label class="form-label" for="firstname">Change File</label>
+                                <div class="input-group">
+                                    <input type="file" class="form-control" name="course_file" required>
+                                </div>
+                            </div><!--end form-group-->
+                        </div>
+                    </div>
+
+
+                </div>
+                <div class="modal-footer">
+                    <button type="submit" class="btn btn-prim" onclick="course_edit_submit()">Submit</button>
+                    <button type="button" class="btn btn-default ml-2" data-dismiss="modal">Close</button>
+                </div>
+            </div>
+        </form>
+    </div>
+</div>
+
+
+<script>
+    function course_type_new1(type){
+        if (type == "file"){
+            $("#file_div1").show()
+            $("#link_div1").hide()
+        }
+        else{
+            $("#file_div1").hide()
+            $("#link_div1").show()
+        }
+    }
+</script>
+
+<script>
+    function course_edit_submit(){
+        event.preventDefault()
+        var form_data = new FormData($('#course_edit_form')[0]);
+        $.ajax({
+            type: 'POST',
+            url: "edit-course-action",
+            data: form_data,
+            processData: false,
+            contentType: false,
+            success: function(data)
+            {
+                status = data['status']
+                message = data['message']
+                if (status == "success"){
+                    document.getElementById('course_edit_form').submit();
+                }
+                var toastMixin = Swal.mixin({
+                toast: true,
+                icon: status,
+                title: 'General Title',
+                animation: false,
+                position: 'top-right',
+                showConfirmButton: false,
+                timer: 1000,
+                timerProgressBar: true,
+                didOpen: (toast) => {
+                    toast.addEventListener('mouseenter', Swal.stopTimer)
+                    toast.addEventListener('mouseleave', Swal.resumeTimer)
+                }
+                });
+                toastMixin.fire({
+                animation: true,
+                title: message
+                });
+
+
+            }
+        })
+
+    }
+</script>
+
+<script>
+  var inputs = document.getElementsByClassName("number_input");
+  for (var i = 0; i < inputs.length; i++) {
+    inputs[i].addEventListener("input", function() {
+      this.value = this.value.replace(/[^0-9+]/g, ''); // Allow only numbers and "+"
+    });
+  }
+</script>
